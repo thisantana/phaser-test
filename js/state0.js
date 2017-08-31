@@ -1,7 +1,8 @@
 var demo = {};
+var starfield;
 var centerX= 1500/2;
 var centerY= 1000/2;
-var aircraft;
+var spacechip;
 var defaultSpeed = 15;
 
 
@@ -11,16 +12,41 @@ demo.state0.prototype = {
 
         //Load Default Images
         game.load.image('starfield','./assets/sprites/space.png');
-        game.load.image('aircraft','./assets/sprites/Aircraft2.png');
+        game.load.spritesheet('spacechip','./assets/sprites/spacechipsheet.png',64,64);
     },
     create: function(){
-        game.stage.backgroundColor = "#0f2";
+        //Start Physics
+        game.physics.startSystem(Phaser.Physics.ARCADE);
+        
+        // game.stage.backgroundColor = "#0f2";
+        game.world.setBounds(0, 0, 1920, 1080);
         console.log('state0');
         changeStateListeners();
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        game.add.sprite(0,0,'starfield');
-        aircraft = game.add.sprite(centerX,centerY,'aircraft');
-        aircraft.anchor.setTo(0.5,0.5);
+
+        //Add Background
+        starfield = game.add.sprite(0,0,'starfield');
+        
+        //Add spacechip
+        spacechip = game.add.sprite(centerX,centerY,'spacechip');
+        spacechip.anchor.setTo(0.5,0.5);
+        spacechip.scale.setTo(1.5,1.5);
+
+        //spacechip physics
+        game.physics.enable(spacechip);
+        spacechip.body.collideWorldBounds = true;
+        
+        //Spacechip Animation
+        spacechip.animations.add('idle', [0]);
+        spacechip.animations.add('dleShooting', [1]);
+        spacechip.animations.add('throttle', [2]);
+        spacechip.animations.add('throttleShooting', [3]);
+       
+        
+
+        //Spacechip Camera
+        game.camera.follow(spacechip);
+        game.camera.deadzone = new Phaser.Rectangle(centerX-300, 0, 600,1920);
     },
     update: function(){
         var moveRight = game.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
@@ -30,13 +56,22 @@ demo.state0.prototype = {
 
         //Movement Keys
         if(moveRight){
-            aircraft.x += defaultSpeed;
+            spacechip.x += defaultSpeed;
+            spacechip.scale.setTo(1.7,1.7);
+            spacechip.animations.play('throttle', 16, true);
+            
         }else if(moveLeft) {
-            aircraft.x += -defaultSpeed
+            spacechip.x += -defaultSpeed
+            spacechip.scale.setTo(-1.7,1.7);
+            spacechip.animations.play('throttle', 16, true);
         }else if(moveUp) {
-            aircraft.y += -defaultSpeed
+            spacechip.y += -defaultSpeed
+            spacechip.animations.play('idle', 16, true);
         }else if(moveDown) {
-            aircraft.y += defaultSpeed
+            spacechip.y += defaultSpeed
+            spacechip.animations.play('idle', 16, true);
+        }else{
+            spacechip.animations.play('idle', 16, true);
         }
     }
 };
