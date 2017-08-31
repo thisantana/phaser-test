@@ -2,7 +2,7 @@ var demo = {};
 var starfield;
 var centerX= 1500/2;
 var centerY= 1000/2;
-var spacechip;
+var spaceship;
 var defaultSpeed = 15;
 
 
@@ -12,7 +12,7 @@ demo.state0.prototype = {
 
         //Load Default Images
         game.load.image('starfield','./assets/sprites/space.png');
-        game.load.spritesheet('spacechip','./assets/sprites/spacechipsheet.png',64,64);
+        game.load.spritesheet('spaceship','./assets/sprites/spaceshipsheet.png',64,64);
     },
     create: function(){
         //Start Physics
@@ -27,25 +27,25 @@ demo.state0.prototype = {
         //Add Background
         starfield = game.add.sprite(0,0,'starfield');
         
-        //Add spacechip
-        spacechip = game.add.sprite(centerX,centerY,'spacechip');
-        spacechip.anchor.setTo(0.5,0.5);
-        spacechip.scale.setTo(1.5,1.5);
+        //Add spaceship
+        spaceship = game.add.sprite(centerX,centerY,'spaceship');
+        spaceship.anchor.setTo(0.5,0.5);
+        spaceship.scale.setTo(1.5,1.5);
 
-        //spacechip physics
-        game.physics.enable(spacechip);
-        spacechip.body.collideWorldBounds = true;
+        //spaceship physics
+        game.physics.enable(spaceship);
+        spaceship.body.collideWorldBounds = true;
         
-        //Spacechip Animation
-        spacechip.animations.add('idle', [0]);
-        spacechip.animations.add('dleShooting', [1]);
-        spacechip.animations.add('throttle', [2]);
-        spacechip.animations.add('throttleShooting', [3]);
+        //spaceship Animation
+        spaceship.animations.add('idle', [0]);
+        spaceship.animations.add('dleShooting', [1]);
+        spaceship.animations.add('throttle', [2]);
+        spaceship.animations.add('throttleShooting', [3]);
        
         
 
-        //Spacechip Camera
-        game.camera.follow(spacechip);
+        //spaceship Camera
+        game.camera.follow(spaceship);
         game.camera.deadzone = new Phaser.Rectangle(centerX-300, 0, 600,1920);
     },
     update: function(){
@@ -56,22 +56,22 @@ demo.state0.prototype = {
 
         //Movement Keys
         if(moveRight){
-            spacechip.x += defaultSpeed;
-            spacechip.scale.setTo(1.7,1.7);
-            spacechip.animations.play('throttle', 16, true);
+            spaceship.x += defaultSpeed;
+            spaceship.scale.setTo(1.7,1.7);
+            spaceship.animations.play('throttle', 16, true);
             
         }else if(moveLeft) {
-            spacechip.x += -defaultSpeed
-            spacechip.scale.setTo(-1.7,1.7);
-            spacechip.animations.play('throttle', 16, true);
+            spaceship.x += -defaultSpeed
+            spaceship.scale.setTo(-1.7,1.7);
+            spaceship.animations.play('throttle', 16, true);
         }else if(moveUp) {
-            spacechip.y += -defaultSpeed
-            spacechip.animations.play('idle', 16, true);
+            spaceship.y += -defaultSpeed
+            spaceship.animations.play('idle', 16, true);
         }else if(moveDown) {
-            spacechip.y += defaultSpeed
-            spacechip.animations.play('idle', 16, true);
+            spaceship.y += defaultSpeed
+            spaceship.animations.play('idle', 16, true);
         }else{
-            spacechip.animations.play('idle', 16, true);
+            spaceship.animations.play('idle', 16, true);
         }
     }
 };
