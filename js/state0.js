@@ -1,9 +1,12 @@
 var demo = {};
 var starfield;
-var centerX= 1500/2;
-var centerY= 1000/2;
+var centerX = 1500/2;
+var centerY = 1000/2;
 var spaceship;
-var defaultSpeed = 15;
+var defaultSpeed = 10;
+var bullet, velocity = 900;
+var nextShoot = 0;
+var bulletRate = 200;
 
 
 demo.state0 = function(){}
@@ -13,24 +16,42 @@ demo.state0.prototype = {
         //Load Default Images
         game.load.image('starfield','./assets/sprites/space.png');
         game.load.spritesheet('spaceship','./assets/sprites/spaceshipsheet.png',64,64);
+        game.load.image('bullet', './assets/sprites/bullet.png');
+        game.load.script('BlurX', 'https://cdn.rawgit.com/photonstorm/phaser/master/v2/filters/BlurX.js');
+        game.load.script('BlurY', 'https://cdn.rawgit.com/photonstorm/phaser/master/v2/filters/BlurY.js');
     },
     create: function(){
+
         //Start Physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
-        
-        // game.stage.backgroundColor = "#0f2";
         game.world.setBounds(0, 0, 1920, 1080);
         console.log('state0');
         changeStateListeners();
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
 
+        //Filters
+        var blurX = game.add.filter('BlurX');
+        var blurY = game.add.filter('BlurY');
+        blurX.blur = 2;
+        blurY.blur = 2;
+
         //Add Background
         starfield = game.add.sprite(0,0,'starfield');
+        starfield.filters = [blurX, blurY];
+        
+        //Spaceship Bullet
+        bullet = game.add.group();
+        bullet.enableBody = true;
+        bullet.physicsBodyType = Phaser.Physics.ARCADE;
+        bullet.createMultiple(200,'bullet');
+        bullet.setAll('anchor.y', 0.5)
+        bullet.filters = [blurX, blurY];
         
         //Add spaceship
-        spaceship = game.add.sprite(centerX,centerY,'spaceship');
+        spaceship = game.add.sprite(130,centerY,'spaceship');
         spaceship.anchor.setTo(0.5,0.5);
         spaceship.scale.setTo(1.5,1.5);
+        spaceship.filters = [blurX, blurY];
 
         //spaceship physics
         game.physics.enable(spaceship);
@@ -38,42 +59,52 @@ demo.state0.prototype = {
         
         //spaceship Animation
         spaceship.animations.add('idle', [0]);
-        spaceship.animations.add('dleShooting', [1]);
+        spaceship.animations.add('idleShooting', [1]);
         spaceship.animations.add('throttle', [2]);
         spaceship.animations.add('throttleShooting', [3]);
-       
-        
 
-        //spaceship Camera
+        //Spaceship Camera
         game.camera.follow(spaceship);
         game.camera.deadzone = new Phaser.Rectangle(centerX-300, 0, 600,1920);
+
     },
-    update: function(){
+    update: function() {
         var moveRight = game.input.keyboard.isDown(Phaser.Keyboard.RIGHT);
         var moveLeft = game.input.keyboard.isDown(Phaser.Keyboard.LEFT);
         var moveUp = game.input.keyboard.isDown(Phaser.Keyboard.UP);
         var moveDown = game.input.keyboard.isDown(Phaser.Keyboard.DOWN);
 
         //Movement Keys
-        if(moveRight){
-            spaceship.x += defaultSpeed;
-            spaceship.scale.setTo(1.7,1.7);
-            spaceship.animations.play('throttle', 16, true);
-            
-        }else if(moveLeft) {
-            spaceship.x += -defaultSpeed
-            spaceship.scale.setTo(-1.7,1.7);
-            spaceship.animations.play('throttle', 16, true);
-        }else if(moveUp) {
+        if(moveUp) {
             spaceship.y += -defaultSpeed
-            spaceship.animations.play('idle', 16, true);
+            spaceship.animations.play('throttle', 16, true);
         }else if(moveDown) {
             spaceship.y += defaultSpeed
-            spaceship.animations.play('idle', 16, true);
+            spaceship.animations.play('throttle', 16, true);
         }else{
-            spaceship.animations.play('idle', 16, true);
+            spaceship.animations.play('throttle', 16, true);
         }
-    }
+
+        //Targeting
+        spaceship.rotation = game.physics.arcade. game.physics.arcade.angleToPointer(spaceship);
+
+        //Shooting Keys
+        if(game.input.activePointer.isDown) {
+            spaceship.animations.play('throttleShooting', 16, true);
+            this.shoot();
+        }
+       
+    },
+    shoot: function() {
+       if(nextShoot < game.time.now) {
+            nextShoot = game.time.now + bulletRate;
+            var shootBullets = bullet.getFirstDead();
+            shootBullets.reset(spaceship.x, spaceship.y);
+            game.physics.arcade.moveToPointer(shootBullets, velocity);
+            shootBullets.rotation = spaceship.rotation;
+            console.log('shooting!');
+       }
+    }  
 };
 
 function changeState(i,stateNum) {
@@ -96,3 +127,4 @@ function changeStateListeners() {
     keyCallback(Phaser.Keyboard.EIGHT, changeState, 8);
     keyCallback(Phaser.Keyboard.NINE, changeState, 9);
 }
+  
