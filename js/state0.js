@@ -1,12 +1,13 @@
 var demo = {};
 var starfield;
-var centerX = 1500/2;
-var centerY = 1000/2;
+var centerX = 1280/2;
+var centerY = 800/2;
 var spaceship;
 var defaultSpeed = 10;
 var bullet, velocity = 900;
 var nextShoot = 0;
 var bulletRate = 200;
+var asteroid;
 
 
 demo.state0 = function(){}
@@ -17,14 +18,16 @@ demo.state0.prototype = {
         game.load.image('starfield','./assets/sprites/space.png');
         game.load.spritesheet('spaceship','./assets/sprites/spaceshipsheet.png',64,64);
         game.load.image('bullet', './assets/sprites/bullet.png');
+        game.load.image('asteroid', './assets/sprites/asteroid.png');
         game.load.script('BlurX', 'https://cdn.rawgit.com/photonstorm/phaser/master/v2/filters/BlurX.js');
         game.load.script('BlurY', 'https://cdn.rawgit.com/photonstorm/phaser/master/v2/filters/BlurY.js');
     },
     create: function(){
+        game.world.setBounds(0, 0, 1280*4, 800);
 
         //Start Physics
         game.physics.startSystem(Phaser.Physics.ARCADE);
-        game.world.setBounds(0, 0, 1920, 1080);
+        game.world.setBounds(0, 0, 1280, 800);
         console.log('state0');
         changeStateListeners();
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -38,7 +41,18 @@ demo.state0.prototype = {
         //Add Background
         starfield = game.add.sprite(0,0,'starfield');
         starfield.filters = [blurX, blurY];
-        
+
+        //Add Asteroid
+
+        asteroid = game.add.group();
+        asteroid.enableBody = true;
+        asteroid.physicsBodyType = Phaser.Physics.ARCADE;
+        asteroid.createMultiple(200,'asteroid');
+        asteroid.scale.setTo(0.2,0.2);
+        // asteroid.anchor.setTo(1.0,1.0);
+
+        // asteroid.filters = [blurX, blurY];
+
         //Spaceship Bullet
         bullet = game.add.group();
         bullet.enableBody = true;
