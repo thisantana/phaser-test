@@ -35,8 +35,8 @@ demo.state0.prototype = {
         //Filters
         var blurX = game.add.filter('BlurX');
         var blurY = game.add.filter('BlurY');
-        blurX.blur = 2;
-        blurY.blur = 2;
+        blurX.blur = 1;
+        blurY.blur = 1;
 
         //Add Background
         starfield = game.add.sprite(0,0,'starfield');
@@ -49,7 +49,6 @@ demo.state0.prototype = {
         asteroid.physicsBodyType = Phaser.Physics.ARCADE;
         asteroid.createMultiple(200,'asteroid');
         asteroid.scale.setTo(0.2,0.2);
-        // asteroid.anchor.setTo(1.0,1.0);
 
         // asteroid.filters = [blurX, blurY];
 
@@ -64,7 +63,7 @@ demo.state0.prototype = {
         //Add spaceship
         spaceship = game.add.sprite(130,centerY,'spaceship');
         spaceship.anchor.setTo(0.5,0.5);
-        spaceship.scale.setTo(1.5,1.5);
+        spaceship.scale.setTo(1.0,1.0);
         spaceship.filters = [blurX, blurY];
 
         //spaceship physics
